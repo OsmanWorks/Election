@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="ur" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#07563f">
+  <meta name="description" content="AJK Election live results, charts and latest updates">
+  <title>AJK Election Live Dashboard</title>
+  <link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js" defer></script>
+  <script src="assets/js/config.js" defer></script>
+  <script src="assets/js/charts.js" defer></script>
+  <script src="assets/js/app.js" defer></script>
+</head>
+<body>
+  <noscript><div class="noscript">اس ویب سائٹ کے لیے JavaScript آن کریں۔</div></noscript>
+
+  <header class="topbar">
+    <a class="brand" href="./" aria-label="AJK Election Dashboard">
+      <span class="logo">AJK</span>
+      <span>
+        <strong>الیکشن لائیو</strong>
+        <small>نتائج، گراف اور تازہ خبریں</small>
+      </span>
+    </a>
+    <div class="live-status">
+      <span class="pulse"></span>
+      <span id="connectionText">ڈیٹا لوڈ ہو رہا ہے</span>
+    </div>
+  </header>
+
+  <nav class="nav">
+    <a href="#overview">خلاصہ</a>
+    <a href="#charts">چارٹس</a>
+    <a href="#results">نتائج</a>
+    <a href="#news">تازہ خبریں</a>
+    <a href="#sources">ذرائع</a>
+  </nav>
+
+  <main>
+    <section class="hero" id="overview">
+      <div>
+        <span class="kicker">آزاد جموں و کشمیر انتخابات</span>
+        <h1>تمام اہم معلومات ایک ہی جگہ</h1>
+        <p>پارٹی پوزیشن، حلقہ وار نتائج، ووٹ، ٹرن آؤٹ اور تازہ ترین میڈیا اپڈیٹس۔</p>
+      </div>
+      <div class="hero-meta">
+        <span>آخری اپڈیٹ</span>
+        <strong id="lastUpdated">—</strong>
+        <button id="refreshButton" class="button">ابھی ریفریش کریں</button>
+      </div>
+    </section>
+
+    <section class="notice" id="dataNotice">
+      <strong>اہم:</strong>
+      حتمی نتیجہ صرف متعلقہ الیکشن کمیشن کا جاری کردہ نتیجہ سمجھیں۔ میڈیا اپڈیٹس غیر سرکاری ہو سکتی ہیں۔
+    </section>
+
+    <section class="stats-grid" aria-label="Election summary">
+      <article class="stat-card">
+        <span>کل نشستیں</span>
+        <strong id="totalSeats">0</strong>
+        <small>ڈیٹا فائل کے مطابق</small>
+      </article>
+      <article class="stat-card">
+        <span>اعلان شدہ نتائج</span>
+        <strong id="declaredSeats">0</strong>
+        <small id="declaredPercent">0%</small>
+      </article>
+      <article class="stat-card">
+        <span>باقی نشستیں</span>
+        <strong id="pendingSeats">0</strong>
+        <small>نتائج کا انتظار</small>
+      </article>
+      <article class="stat-card">
+        <span>اوسط ٹرن آؤٹ</span>
+        <strong id="averageTurnout">0%</strong>
+        <small>اعلان شدہ حلقے</small>
+      </article>
+    </section>
+
+    <section class="panel" id="charts">
+      <div class="section-heading">
+        <div>
+          <span class="kicker">آسان جائزہ</span>
+          <h2>پارٹی پوزیشن اور ووٹ</h2>
+        </div>
+        <span class="muted">چارٹس خودکار طور پر نتائج کے ڈیٹا سے بنتے ہیں</span>
+      </div>
+
+      <div class="charts-grid">
+        <article class="chart-card">
+          <h3>پارٹی کے حساب سے نشستیں</h3>
+          <div class="chart-wrap"><canvas id="seatsChart"></canvas></div>
+        </article>
+        <article class="chart-card">
+          <h3>ووٹ شیئر</h3>
+          <div class="chart-wrap"><canvas id="votesChart"></canvas></div>
+        </article>
+        <article class="chart-card wide">
+          <h3>حلقہ وار ٹرن آؤٹ</h3>
+          <div class="chart-wrap chart-wide"><canvas id="turnoutChart"></canvas></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="panel" id="results">
+      <div class="section-heading">
+        <div>
+          <span class="kicker">حلقہ وار تفصیل</span>
+          <h2>نتائج</h2>
+        </div>
+      </div>
+
+      <div class="filters">
+        <label>
+          <span>تلاش</span>
+          <input id="searchInput" type="search" placeholder="حلقہ، امیدوار یا پارٹی">
+        </label>
+        <label>
+          <span>پارٹی</span>
+          <select id="partyFilter"><option value="">تمام پارٹیاں</option></select>
+        </label>
+        <label>
+          <span>حالت</span>
+          <select id="statusFilter">
+            <option value="">تمام نتائج</option>
+            <option value="declared">اعلان شدہ</option>
+            <option value="leading">برتری</option>
+            <option value="pending">زیر التوا</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>حلقہ</th>
+              <th>علاقہ</th>
+              <th>امیدوار</th>
+              <th>پارٹی</th>
+              <th>ووٹ</th>
+              <th>ٹرن آؤٹ</th>
+              <th>حالت</th>
+            </tr>
+          </thead>
+          <tbody id="resultsBody"></tbody>
+        </table>
+      </div>
+      <div id="emptyResults" class="empty hidden">کوئی نتیجہ نہیں ملا۔</div>
+    </section>
+
+    <section class="panel" id="news">
+      <div class="section-heading">
+        <div>
+          <span class="kicker">آٹو ریفریش</span>
+          <h2>تازہ خبریں اور اپڈیٹس</h2>
+        </div>
+        <span class="muted">ہر 60 سیکنڈ بعد کوشش کی جاتی ہے</span>
+      </div>
+      <div id="newsGrid" class="news-grid">
+        <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
+      </div>
+    </section>
+
+    <section class="panel sources" id="sources">
+      <div class="section-heading">
+        <div>
+          <span class="kicker">شفافیت</span>
+          <h2>ڈیٹا کے ذرائع</h2>
+        </div>
+      </div>
+      <div id="sourceList" class="source-list"></div>
+      <p class="source-note">
+        براؤزر سکیورٹی یا کسی نیوز ویب سائٹ کی پابندی کی وجہ سے بیرونی فیڈ عارضی طور پر بند ہو سکتی ہے۔
+        ایسی صورت میں مقامی fallback اپڈیٹس دکھائی جائیں گی۔
+      </p>
+    </section>
+  </main>
+
+  <footer>
+    <p>AJK Election Dashboard — معلوماتی اور غیر سرکاری ویب سائٹ</p>
+    <a href="#overview">اوپر جائیں ↑</a>
+  </footer>
+</body>
+</html>
