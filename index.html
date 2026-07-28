@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Election Updates</title>
+<style>
+body{font-family:Arial,sans-serif;background:#f4f4f4;margin:0}
+header{background:#0b5d3b;color:#fff;padding:20px;text-align:center}
+#list{max-width:900px;margin:20px auto;padding:0 15px}
+.card{background:#fff;padding:15px;border-radius:8px;margin-bottom:12px;box-shadow:0 2px 5px rgba(0,0,0,.1)}
+small{color:#666}
+</style></head>
+<body>
+<header><h2>AJK Election Updates</h2><p>Refreshes every 60 seconds</p></header>
+<div id="list"><p>Loading…</p></div>
+<script>
+async function load(){
+ const url="https://api.allorigins.win/raw?url="+encodeURIComponent("https://www.dawn.com/feeds/home");
+ try{
+   const xml=await (await fetch(url)).text();
+   const doc=new DOMParser().parseFromString(xml,"text/xml");
+   const items=[...doc.querySelectorAll("item")];
+   const out=document.getElementById("list");
+   out.innerHTML="";
+   items.filter(i=>/kashmir|ajk|election/i.test(i.textContent)).forEach(i=>{
+      out.innerHTML+=`<div class="card">
+      <h3>${i.querySelector("title")?.textContent||""}</h3>
+      <small>${i.querySelector("pubDate")?.textContent||""}</small>
+      <p>${(i.querySelector("description")?.textContent||"").replace(/<[^>]+>/g,"")}</p>
+      <a target="_blank" href="${i.querySelector("link")?.textContent||"#"}">Read More</a>
+      </div>`;
+   });
+   if(!out.innerHTML) out.innerHTML="<div class='card'>No matching updates found.</div>";
+ }catch(e){
+   document.getElementById("list").innerHTML="<div class='card'>Unable to load feed.</div>";
+ }
+}
+load();setInterval(load,60000);
+</script>
+</body></html>
